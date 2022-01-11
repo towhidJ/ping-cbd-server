@@ -50,14 +50,25 @@ async function run() {
         await client.connect();
         const database = client.db("ping-bd");
         const applicationCourseCollection = database.collection('application-course');
+        const coursesCollection = database.collection('courses');
         const usersCollection = database.collection('users');
+        const trainersCollection = database.collection('trainers');
 
 
 
 
         //Course Api
-        app.get('/course', async(req, res)=>{
-            res.send('');
+        app.get('/courses', async(req, res)=>{
+            const cursor = coursesCollection.find({"isActive":true});
+            const result = await cursor.toArray();
+            res.json(result);
+        })
+
+        // post course api
+        app.post('/courses',async (req, res)=>{
+            const body = req.body;
+            const result = await coursesCollection.insertMany(body);
+            res.json(result);
         })
 
 
@@ -97,6 +108,16 @@ async function run() {
             res.json(order);
         });
 
+
+        // app.post('/ckdata', async (req, res) => {
+        //     console.log(req.body);
+        //     let user = req.body;
+        //     const result = await ckData.insertOne(user);
+        //     console.log(result);
+        //     res.json(result);
+        // });
+
+
         //Delete Admission
         app.delete("/applications/:id", async (req, res) => {
             const id = req.params.id;
@@ -105,11 +126,27 @@ async function run() {
             res.send(result);
         });
 
+//Trainner Api
+
+        //get Trainer
+        app.get('/trainers',async (req, res)=>{
+           const query = {};
+           const cursor =  trainersCollection.find(query);
+           const result = await cursor.toArray();
+           res.json(result);
+        });
+
+        //post triner
+        app.post('/trainer',async (req, res)=>{
+            const body = req.body;
+            const result = await trainersCollection.insertOne(body);
+            res.json(result);
+        })
 
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
-            console.log(query);
+            console.log(email);
             const user = await usersCollection.findOne(query);
             let isAdmin = false;
             if (user?.role === 'admin') {
