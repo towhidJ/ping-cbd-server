@@ -131,7 +131,7 @@ async function run() {
         //get Trainer
         app.get('/trainers',async (req, res)=>{
            const query = {};
-           const cursor =  trainersCollection.find(query);
+           const cursor =  trainersCollection.find(query).sort({ seqId: 1 });
            const result = await cursor.toArray();
            res.json(result);
         });
