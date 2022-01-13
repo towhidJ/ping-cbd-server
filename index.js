@@ -227,6 +227,10 @@ app.get('/',(req,res)=>{
     res.send("server start");
 })
 
+app.get('/heroku',(req,res)=>{
+    res.send("servers sa start");
+})
+
 app.listen(port,()=>{
     console.log("Port listen 5000");
 })
