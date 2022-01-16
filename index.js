@@ -51,8 +51,9 @@ async function run() {
         await client.connect();
         const database = client.db("ping-bd");
         const applicationCourseCollection = database.collection('application-course');
-        const coursesCollection = database.collection('courses');
         const usersCollection = database.collection('users');
+        const coursesCollection = database.collection('courses');
+        const courseNameListCollection = database.collection('courses-name-lists');
         const trainersCollection = database.collection('trainers');
 
 
@@ -124,6 +125,35 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await applicationCourseCollection.deleteOne(query);
+            res.send(result);
+        });
+
+        //Get Course NAme list
+
+        app.get("/coursenamelist", async (req, res) => {
+
+            const query = {};
+            const cursor = await courseNameListCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        //post Course NAme list
+
+        app.post("/courseNameList", async (req, res) => {
+            const body = req.body;
+
+            const result = await courseNameListCollection.insertMany(body);
+            res.send(result);
+        });
+
+
+        //delete Course NAme list
+
+        app.delete("/applications/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await courseNameListCollection.deleteOne(query);
             res.send(result);
         });
 
