@@ -55,6 +55,7 @@ async function run() {
         const coursesCollection = database.collection('courses');
         const courseNameListCollection = database.collection('courses-name-lists');
         const universityCollection = database.collection('university');
+        const bannerImgCollection = database.collection('bannerImg');
         const trainersCollection = database.collection('trainers');
 
 
@@ -179,6 +180,25 @@ async function run() {
             res.send(result);
         });
 
+
+        //Get bannerImg List
+
+        app.get("/bannerImg", async (req, res) => {
+
+            const query = {};
+            const cursor = await bannerImgCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        //post bannerImg list
+
+        app.post("/bannerImg", async (req, res) => {
+            const body = req.body;
+
+            const result = await bannerImgCollection.insertMany(body);
+            res.send(result);
+        });
 
         //delete university list
 
