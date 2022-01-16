@@ -54,6 +54,7 @@ async function run() {
         const usersCollection = database.collection('users');
         const coursesCollection = database.collection('courses');
         const courseNameListCollection = database.collection('courses-name-lists');
+        const universityCollection = database.collection('university');
         const trainersCollection = database.collection('trainers');
 
 
@@ -150,12 +151,44 @@ async function run() {
 
         //delete Course NAme list
 
-        app.delete("/applications/:id", async (req, res) => {
+        app.delete("/courseNameList/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await courseNameListCollection.deleteOne(query);
             res.send(result);
         });
+
+
+
+        //Get University List
+
+        app.get("/university", async (req, res) => {
+
+            const query = {};
+            const cursor = await universityCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        //post university list
+
+        app.post("/university", async (req, res) => {
+            const body = req.body;
+
+            const result = await universityCollection.insertMany(body);
+            res.send(result);
+        });
+
+
+        //delete university list
+
+        app.delete("/university/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await universityCollection.deleteOne(query);
+            res.send(result);
+        });
+
 
 //Trainner Api
 
