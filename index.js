@@ -63,7 +63,7 @@ async function run() {
 
         //Course Api
         app.get('/courses', async(req, res)=>{
-            const cursor = coursesCollection.find({"isActive":true});
+            const cursor = coursesCollection.find({"isActive":true}).sort({_id:-1});
             const result = await cursor.toArray();
             res.json(result);
         })
