@@ -55,8 +55,9 @@ async function run() {
         const coursesCollection = database.collection('courses');
         const courseNameListCollection = database.collection('courses-name-lists');
         const universityCollection = database.collection('university');
-        const bannerImgCollection = database.collection('bannerImg');
         const trainersCollection = database.collection('trainers');
+        const bannerImgCollection = database.collection('bannerImg');
+        const newsCollection = database.collection('news-list');
 
 
 
@@ -72,6 +73,27 @@ async function run() {
         app.post('/courses',async (req, res)=>{
             const body = req.body;
             const result = await coursesCollection.insertMany(body);
+            res.json(result);
+        })
+
+
+        //news Api
+        app.get('/news', async(req, res)=>{
+            const cursor = newsCollection.find({}).sort({_id:-1});
+            const result = await cursor.toArray();
+            res.json(result);
+        })
+
+        // post news api
+        app.post('/news',async (req, res)=>{
+            const body = req.body;
+            var today = new Date();
+            var year = today.getFullYear();
+            var mes = today.getMonth()+1;
+            var dia = today.getDate();
+            var date =dia+"-"+mes+"-"+year;
+            body.date = date;
+            const result = await newsCollection.insertOne(body);
             res.json(result);
         })
 
