@@ -96,7 +96,13 @@ async function run() {
             const result = await newsCollection.insertOne(body);
             res.json(result);
         })
-
+//Delete news
+        app.delete("/news/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await newsCollection.deleteOne(query);
+            res.send(result);
+        });
 
         //Application-Course
 
