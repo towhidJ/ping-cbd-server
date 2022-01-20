@@ -3,6 +3,8 @@ const cors = require('cors');
 const admin = require("firebase-admin");
 const ObjectId = require('mongodb').ObjectId;
 const port = process.env.PORT || 5000;
+const fileUpload = require('express-fileupload');
+
 
 require('dotenv/config');
 const {MongoClient} = require("mongodb");
@@ -10,7 +12,7 @@ const {MongoClient} = require("mongodb");
 const app = express();
 app.use(express.json())
 app.use(cors())
-
+app.use(fileUpload());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.8g4ei.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -86,14 +88,28 @@ async function run() {
 
         // post news api
         app.post('/news',async (req, res)=>{
-            const body = req.body;
+            // const body = req.body;
+            console.log(req.body)
             var today = new Date();
             var year = today.getFullYear();
             var mes = today.getMonth()+1;
             var dia = today.getDate();
             var date =dia+"-"+mes+"-"+year;
-            body.date = date;
-            const result = await newsCollection.insertOne(body);
+            const newsTitle = req.body.newsTitle;
+            const newsMessage = req.body.newsMessage;
+            const pic = req.files.image;
+            const picData = pic.data;
+            const encodedPic = picData.toString('base64');
+            const imageBuffer = Buffer.from(encodedPic, 'base64');
+            const news = {
+                newsTitle,
+                newsMessage,
+                img: imageBuffer,
+                date
+            }
+
+
+            const result = await newsCollection.insertOne(news);
             res.json(result);
         })
 //Delete news
