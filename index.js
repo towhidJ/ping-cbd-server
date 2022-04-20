@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const admin = require("firebase-admin");
 const ObjectId = require('mongodb').ObjectId;
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 7000;
 const fileUpload = require('express-fileupload');
 
 
@@ -60,6 +60,10 @@ async function run() {
         const trainersCollection = database.collection('trainers');
         const bannerImgCollection = database.collection('bannerImg');
         const newsCollection = database.collection('news-list');
+        const productsCollection = database.collection("products");
+        const ordersCollection = database.collection("orders");
+
+
 
 
 
@@ -338,6 +342,110 @@ async function run() {
 
         })
 
+
+        //Get Products
+        app.get("/products", async (req, res) => {
+            const cursor = productsCollection.find({}).sort({ _id: -1 });
+            const count = await cursor.count();
+            const page = req.query.page;
+            const size = parseInt(req.query.size);
+            let products;
+            if (page) {
+                products = await cursor
+                    .skip(page * size)
+                    .limit(size)
+                    .toArray();
+            } else {
+                products = await cursor.toArray();
+            }
+
+            res.send({
+                count,
+                products,
+            });
+        });
+
+        //Delete Products
+        app.delete("/products/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(query);
+            res.send(result);
+        });
+
+        //Post Product
+        app.post("/product", async (req, res) => {
+            const product = req.body;
+            const result = await productsCollection.insertOne(product);
+            res.json(product);
+        });
+
+        //use post to Get Order By Email
+        app.post("/orders/byEmail", async (req, res) => {
+            const email = req.body;
+            const query = { email: email.email };
+
+            const orders = await ordersCollection.find(query).toArray();
+            res.json(orders);
+        });
+
+        //Get Order
+        app.get("/orders", async (req, res) => {
+            const cursor = ordersCollection.find({}).sort({ _id: -1 });
+            const orders = await cursor.toArray();
+            res.json(orders);
+        });
+        //Get Order by id
+        app.get("/orders/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const order = await ordersCollection.findOne(query);
+
+            res.json(order);
+        });
+
+        app.put("/orders/:id", async (req, res) => {
+            const id = req.params.id;
+            const payment = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    payment: payment,
+                },
+            };
+            const result = await ordersCollection.updateOne(filter, updateDoc);
+            res.json(result);
+        });
+
+        //Add orders
+        app.post("/orders", async (req, res) => {
+            const data = req.body;
+            const order = await ordersCollection.insertOne(data);
+            res.json(order);
+        });
+
+        //Updata Order status
+        app.put("/status/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const data = req.body;
+            const updateDoc = {
+                $set: {
+                    status: data.status,
+                },
+            };
+            console.log(data);
+            const order = await ordersCollection.updateOne(query, updateDoc);
+            res.json(order);
+        });
+
+        //Delete Order
+        app.delete("/orders/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await ordersCollection.deleteOne(query);
+            res.send(result);
+        });
 
 
     }
