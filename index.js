@@ -365,6 +365,13 @@ async function run() {
             });
         });
 
+        app.get("/products/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productsCollection.findOne(query);
+            res.send(result);
+        });
+
         //Delete Products
         app.delete("/products/:id", async (req, res) => {
             const id = req.params.id;
@@ -372,7 +379,20 @@ async function run() {
             const result = await productsCollection.deleteOne(query);
             res.send(result);
         });
+//use post to Get Products By Key
+        app.post("/products/byId", async (req, res) => {
+            const keys = req.body;
+            let a = [];
+            for (const k of keys) {
+                a.push(ObjectId(k));
+            }
 
+            const query = { _id: { $in: a } };
+            console.log(query);
+            const products = await productsCollection.find(query).toArray();
+            console.log(products);
+            res.json(products);
+        });
         //Post Product
         app.post("/product", async (req, res) => {
             const product = req.body;
